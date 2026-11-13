@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auction Cost Calculator</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      max-width: 420px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { font-size: 1.4rem; margin-top: 0; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    td { padding: 8px 0; border-bottom: 1px solid #eee; }
+    td:last-child { text-align: right; }
+    tr.total td {
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-top: 2px solid #333;
+      border-bottom: none;
+    }
+    .note { color: #666; font-size: 0.85rem; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Auction Cost Calculator</h1>
+
+    <label for="bid">Winning bid ($)</label>
+    <input id="bid" type="number" min="0" step="0.01" placeholder="1000" inputmode="decimal" autofocus>
+
+    <table>
+      <tr><td>Winning bid</td><td id="outBid">$0.00</td></tr>
+      <tr><td>Buyer's premium (13%)</td><td id="outPremium">$0.00</td></tr>
+      <tr><td>Subtotal</td><td id="outSubtotal">$0.00</td></tr>
+      <tr><td>NY sales tax (8.75%)</td><td id="outTax">$0.00</td></tr>
+      <tr class="total"><td>TOTAL</td><td id="outTotal">$0.00</td></tr>
+    </table>
+
+    <p class="note">Sales tax is calculated on the winning bid plus the buyer's premium.</p>
+  </div>
+
+  <script>
+    var PREMIUM_RATE = 13;      // percent
+    var TAX_RATE = 8.75;        // percent
+
+    var bidInput = document.getElementById('bid');
+
+    function money(cents) {
+      return '$' + (cents / 100).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function calculate() {
+      var value = parseFloat(bidInput.value);
+      if (isNaN(value) || value < 0) value = 0;
+
+      // work in whole cents to avoid floating-point rounding errors
+      var bid = Math.round(value * 100);
+      var premium = Math.round(bid * PREMIUM_RATE / 100);
+      var subtotal = bid + premium;
+      var tax = Math.round(subtotal * (TAX_RATE * 100) / 10000);
+      var total = subtotal + tax;
+
+      document.getElementById('outBid').textContent = money(bid);
+      document.getElementById('outPremium').textContent = money(premium);
+      document.getElementById('outSubtotal').textContent = money(subtotal);
+      document.getElementById('outTax').textContent = money(tax);
+      document.getElementById('outTotal').textContent = money(total);
+    }
+
+    bidInput.addEventListener('input', calculate);
+    calculate();
+  </script>
+</body>
+</html>
